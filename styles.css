@@ -1,0 +1,28 @@
+#root-container{
+
+	  margin: auto;
+	  width: 70%;
+	  padding: 10px;
+
+}
+
+#root{
+    display: grid;
+    grid-template-columns: 1fr 1fr; 
+    grid-gap: 2px;
+}
+#banner{
+	margin:auto;
+	 width: 70%;
+}
+#banner-text{
+	margin:auto;
+	width: 30%;
+	font-family: 'Roboto', sans-serif;
+}
+a{
+	font-family: 'Roboto', sans-serif;
+}
+#description-paragraph{
+	font-family: 'Roboto', sans-serif;
+}
