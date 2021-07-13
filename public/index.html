@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="styles.css" />
+    <title>Document</title>
+    <!-- CDN import of the jspdf library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.4.1/jspdf.debug.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.js"></script>
+    <script src="https://code.jquery.com/jquery-3.3.1.js" integrity="sha256-2Kok7MbOyxpgUVvAk/HJ2jigOSYS2auK4Pfzbm7uH60="></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.3/Chart.bundle.js"></script>
+    <script src = "app.js"></script>
+</head>
+    <body>
+        <div id="banner">
+            <h1 id="banner-text">Pdf Generator</h1>
+            <a id="description-banner" href = "#">What is this?</a>
+            <p id='description-paragraph' style="visibility: hidden"> This is the UI for a pdf generator I am currently developing. The idea is simple, you select some photos and then eventually they will download in the browser for you!</p>
+        </div>
+
+        <div id="root-container">
+            <div id="root"></div>
+        </div>
+    <div id="submit-button-container">
+        <button id="submit-button" style="visibility: hidden">Create Pdf</button>
+    </div>
+    </body>
+</html>
