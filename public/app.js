@@ -1,16 +1,15 @@
-//log july1: 10:40 pm - 11:38 pm 12:20 - 12:40, july 9 3 hours
+//log july1: 10:40 pm - 11:38 pm 12:20 - 12:40, july 9 3 hours, july 13: 10:20 - 4:30., july 15 10:07 am - 
 // Goal of this file is to see wether we can implement the back shadow on hover effect
 //_________________________________________// 
 
 
-let URLS; // Global object containing the base64 encodings of the images
-fetch('/urls', { method:'GET'})
-.then(response => response.json())
-.then((data) =>{
-	URLS = data;
-	// console.log("we just got the urls!"); 
-	// console.log(Object.keys(URLS)); 
-}); 
+
+// API call for base64 encodings of the images
+const getImageUrls = async () =>{
+	const response = await fetch('/urls', { method:'GET'}); 
+	const data = await response.json(); 
+	return data; // return the json 
+}
 
 const centerElements = (elements) =>{
 	elements.forEach( (element) =>{
@@ -42,8 +41,8 @@ const createImageDiv = (imageName) =>{
 	const clickedIcon = document.createElement('img'); 
 
 	image.src = `images/${imageName}`;
-	image.width = 400; 
-	image.height= 300;
+	image.style.width = '100%';
+	image.height = 300; 
 
 	clickedIcon.src = `verified.png`; 
 	clickedIcon.width = 40; 
@@ -80,9 +79,9 @@ const handleHoverOut = (image) =>{
 
 const handleClick = (image, selectedImages, index) =>{
 	// managing visibility of icon 
-	let visibility = 'visible'; 
+	let visibility = 'visible';
 	if (selectedImages[index]){ // if it is already selected
-		visibility = 'hidden'; 
+		visibility = 'hidden';
 	}
 	const clickedIcon = image.lastChild.previousElementSibling; 
 	clickedIcon.style.visibility = visibility;
@@ -93,14 +92,11 @@ const handleClick = (image, selectedImages, index) =>{
 		caption.style.visibility = 'hidden'; 
 	}
 }
-// Helper function for HandleSubmit() used in createPDF(). 
-const getImageURL = (name) =>{
-	return URLS[name]; 
-}; 
+
 // creates a pdf -- helper function for handleSubmit() 
-const createPDF = (imageNames) =>{
+const createPDF = (imageUrls) =>{
 	const doc = new jsPDF();
-	const images = imageNames.map((name, index)=>getImageURL(name)); 
+	const images = imageUrls; 
 	console.log("images:", images); 
 	const centre_x = 60;
 	const starting_y = 10; 
@@ -123,10 +119,8 @@ const createPDF = (imageNames) =>{
 }
 
 // filters selected images from URL object
-const handleSubmit = (selectedImageNumbers) =>{
-	// console.log("Submitted.");
-	// console.log(selectedImageNumbers);
-	createPDF(selectedImageNumbers); 
+const handleSubmit = (selectedImageUrls) =>{
+	createPDF(selectedImageUrls); 
 }
 // re-initializes the Boolean selectedImages array to false -- no longer selected. Used after submitting 'generate my pdf'. 
 const resetSelectedImages = (selectedImages) =>{
@@ -138,19 +132,27 @@ const resetSelectedImages = (selectedImages) =>{
 const resetSelectedImageIcons = (images) =>{
 	images.forEach( (image)=>{
 		const clickedIcon = image.lastChild.previousElementSibling; 
-		clickedIcon.style.visibility = 'hidden'; 
+		clickedIcon.style.visibility = 'hidden';
 	} ); 
 }
 // kind of like the 'main' function that we see in java, python, c, etc. 
-window.onload = (event) =>{
-
-	const imageDigs = ['01', '02', '03', '04', '05', '06', '07', '09', '10','11', '12', '13']; 
+window.onload = async (event) =>{
+	// load the json from the api call getImageURls() 
+	let urls = []; 
+	try {
+		urls = await getImageUrls(); 
+	} catch(e) {
+		console.log('Error asyncing the images'); 
+		console.log(e); 
+	}
+	
+	const imageDigs = Object.keys(urls).sort(); // the keys of the object are the image names -- need to sort for them to retain orig order. 
 	const imageNames = imageDigs.map((imageName)=>`${imageName}.jpg` );
 	const root = document.getElementById('root');	// create an image element for each, set width and height 
 	const images = imageNames.map( (imageName) => createImageDiv(imageName)); // create the image divs 
 	const submitButton = document.getElementById("submit-button");
 	submitButton.style.visibility = "visible"; // We hide the submit button initially in order to have it load more pleasantly (visually)
-	appendChildren(root, images.concat([submitButton])); // append the image divs to the root of the DOM + Submit button
+	appendChildren(root, images); // append the image divs to the root of the DOM 
 	const selectedImages = images.map( ()=>false ); // init as all false -not selected
 	const description = document.getElementById('description-banner'); 
 
@@ -179,8 +181,9 @@ window.onload = (event) =>{
 		// the SelectedImageNumbers array contains the 'image names' that were selected. ie if image 1 and 2 were selected then this 
 		// array will be ['01', '02']. 
 		const selectedImageNumbers = imageDigs.filter((imageNum, index) => selectedImages[index]);
-		if (selectedImageNumbers.length > 0){
-			handleSubmit(selectedImageNumbers);
+		const selectedImageUrls = selectedImageNumbers.map((imageNum) => urls[imageNum]); // array of all the base 64 encodings of the selected images 
+		if (selectedImageUrls.length > 0){
+			handleSubmit(selectedImageUrls);
 			resetSelectedImages(selectedImages);
 			resetSelectedImageIcons(images); 
 			console.log(selectedImages); 
