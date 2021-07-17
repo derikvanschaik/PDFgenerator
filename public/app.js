@@ -1,4 +1,4 @@
-//log july1: 10:40 pm - 11:38 pm 12:20 - 12:40, july 9 3 hours, july 13: 10:20 - 4:30., july 15 10:07 am - 
+//log july1: 10:40 pm - 11:38 pm 12:20 - 12:40, july 9 3 hours, july 13: 10:20 - 4:30., july 15 10:07 am - 10:33 am
 // Goal of this file is to see wether we can implement the back shadow on hover effect
 //_________________________________________// 
 
@@ -137,6 +137,7 @@ const resetSelectedImageIcons = (images) =>{
 }
 // kind of like the 'main' function that we see in java, python, c, etc. 
 window.onload = async (event) =>{
+	
 	// load the json from the api call getImageURls() 
 	let urls = []; 
 	try {
