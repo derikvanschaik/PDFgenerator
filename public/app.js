@@ -71,24 +71,38 @@ const handleHoverOn = (image, isSelected) => {
 	// the box shadow css styling that creates the backshadow when hovering 
 	image.style.boxShadow = '5px 5px 10px 8px #d3d3d3';
 	const caption = image.firstChild.nextElementSibling.nextElementSibling;
+	const input = image.lastChild.previousSibling; 
+	const button = input.nextElementSibling; 
 	// make the 'click to select' caption visible if they have not selected the div 
-	if (!isSelected){
+	if (!isSelected || caption.textContent !== "Click to Select"){
+		console.log(caption.textContent); 
 		caption.style.visibility = 'visible';
+	}else{
+		input.style.visibility = 'visible'; 
+		button.style.visibility = 'visible'; 
 	}
 }
 
-const handleHoverOut = (image) =>{
+const handleHoverOut = (image, isSelected) =>{
 	// revert box shadow 
 	image.style.boxShadow = null;
-	const caption = image.firstChild.nextElementSibling.nextElementSibling; 
-	// hide the caption 
-	caption.style.visibility = 'hidden'; 
+	const caption = image.firstChild.nextElementSibling.nextElementSibling;
+	const input = image.lastChild.previousSibling; 
+	const button = input.nextElementSibling; 
+	// hide the caption if it has not been altered 
+	if (!isSelected){
+		caption.style.visibility = 'hidden';
+	}
+	input.style.visibility = 'hidden'; 
+	button.style.visibility = 'hidden'; 
+	
 }
 
 const handleClick = (image, selectedImages, index) =>{
 	// managing visibility of icon 
 	let visibility = 'visible';
 	if (selectedImages[index]){ // if it is already selected
+		const caption = image.firstChild.nextElementSibling.nextElementSibling.textContent = "Click to Select"; // revert caption back
 		visibility = 'hidden';
 	}
 	const clickedIcon = image.firstChild.nextElementSibling; 
@@ -173,7 +187,7 @@ window.onload = async (event) =>{
 	submitButton.style.visibility = "visible"; // We hide the submit button initially in order to have it load more pleasantly (visually)
 	appendChildren(root, images); // append the image divs to the root of the DOM 
 	const selectedImages = images.map( ()=>false ); // init as all false -not selected
-	const description = document.getElementById('description-banner'); 
+	const description = document.getElementById('description-banner');
 
 	// add Event Listeners 
 	images.forEach( (image, index) =>{
@@ -182,18 +196,29 @@ window.onload = async (event) =>{
 			handleHoverOn(image, selectedImages[index]);
 		}; 
 		image.onmouseout =  ()=>{
-			handleHoverOut(image); 
+			handleHoverOut(image, selectedImages[index]); 
 		}; 
 		image.onclick = () =>{
 			handleClick(image, selectedImages, index); 
 		};
+		// this is the 'submit button' getting clicked -- want to stop default click event and change caption
+		// and caption visiblity!
 		image.lastChild.onclick = (event) =>{
 			// prevent default click event handClick()
 			console.log('Here'); 
-			event.stopPropagation(); 
-		}; 
+			event.stopPropagation();
+			const caption = image.firstChild.nextElementSibling.nextElementSibling;
+			const input = image.lastChild.previousSibling;
+			if (input.value === ""){
+				alert("Captions cannot be left blank.");
+				return; 
+			}
+			caption.textContent = input.value; // keep track of the captions 
+			caption.style.visibility = 'visible'; 
+			input.value = ""; // clear input  
+		};
+		// this is the input element getting clicked -- want to stop default click event 
 		image.lastChild.previousSibling.onclick = (event) =>{
-			console.log("here i guess"); 
 			event.stopPropagation(); 
 		} 
 
