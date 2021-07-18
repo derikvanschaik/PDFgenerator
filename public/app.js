@@ -109,13 +109,16 @@ const handleClick = (image, selectedImages, index) =>{
 	}
 	const clickedIcon = image.firstChild.nextElementSibling; 
 	clickedIcon.style.visibility = visibility;
-	selectedImages[index] = !selectedImages[index];
+	selectedImages[index] = !selectedImages[index]; // toggle selection value 
 
-	// managing visiblity of caption and input element and button element
-	// button and input element are visible and hidden together
 	const caption = clickedIcon.nextElementSibling;
 	const input = caption.nextElementSibling;
-	const button = input.nextElementSibling; 
+	const button = input.nextElementSibling;
+	// reset input placeholder and button text to their default texts
+	input.placeholder = "Add caption"; 
+	button.textContent = "Submit Caption"; 
+	// managing visiblity of caption and input element and button element
+	// button and input element are visible and hidden together
 	if (selectedImages[index] ){ 
 		caption.style.visibility = 'hidden';
 		input.style.visibility = 'visible'; // input element is visible when selected 
@@ -128,7 +131,7 @@ const handleClick = (image, selectedImages, index) =>{
 }
 
 // creates a pdf -- helper function for handleSubmit() 
-const createPDF = (imageUrls) =>{
+const createPDF = (imageUrls, captions) =>{
 	const doc = new jsPDF();
 	const images = imageUrls; 
 	console.log("images:", images); 
@@ -146,6 +149,12 @@ const createPDF = (imageUrls) =>{
 		const offset =delta_y*(index%(imagesPerPage));
 		const y = starting_y + offset; 
 		doc.addImage(img, 'JPEG', centre_x, y, 80, 50);
+		// user wrote a caption if not the 'click to select' default caption is present at current index 
+		if (captions[index] !== "Click to Select"){
+			const heightOfImageOnPdf = 55; 
+			doc.text(captions[index], centre_x, y +heightOfImageOnPdf); // write the caption to the curr locatin --need to offset the text a bit -- 55 helps idk
+		}
+		
 
 	}); 
 	
@@ -153,8 +162,8 @@ const createPDF = (imageUrls) =>{
 }
 
 // filters selected images from URL object
-const handleSubmit = (selectedImageUrls) =>{
-	createPDF(selectedImageUrls); 
+const handleSubmit = (selectedImageUrls, captions) =>{
+	createPDF(selectedImageUrls, captions); 
 }
 // re-initializes the Boolean selectedImages array to false -- no longer selected. Used after submitting 'generate my pdf'. 
 const resetSelectedImages = (selectedImages) =>{
@@ -211,13 +220,17 @@ window.onload = async (event) =>{
 			event.stopPropagation();
 			const caption = image.firstChild.nextElementSibling.nextElementSibling;
 			const input = image.lastChild.previousSibling;
+			const button = image.lastChild; 
 			if (input.value === ""){
 				alert("Captions cannot be left blank.");
 				return; 
 			}
 			caption.textContent = input.value; // keep track of the captions 
 			caption.style.visibility = 'visible'; 
-			input.value = ""; // clear input  
+			input.value = ""; // clear input
+			// reset the input and button texts 
+			input.placeholder = "Write a new caption."; 
+			button.textContent = "Submit New Caption"; 
 		};
 		// this is the input element getting clicked -- want to stop default click event 
 		image.lastChild.previousSibling.onclick = (event) =>{
@@ -237,8 +250,11 @@ window.onload = async (event) =>{
 		// array will be ['01', '02']. 
 		const selectedImageNumbers = imageDigs.filter((imageNum, index) => selectedImages[index]);
 		const selectedImageUrls = selectedImageNumbers.map((imageNum) => urls[imageNum]); // array of all the base 64 encodings of the selected images 
+		const captions = images.map( (image) => image.firstChild.nextSibling.nextSibling.textContent); // get the captions 
+
 		if (selectedImageUrls.length > 0){
-			handleSubmit(selectedImageUrls);
+			console.log(captions); 
+			handleSubmit(selectedImageUrls, captions);
 			resetSelectedImages(selectedImages);
 			resetSelectedImageIcons(images); 
 			console.log(selectedImages); 

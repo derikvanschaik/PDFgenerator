@@ -44,6 +44,22 @@ a{
 	font-size: x-large; 
 	/* margin:auto;  */
 }
+input{
+    padding:5px; 
+    border:2px solid #ccc; 
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+}
+button{
+
+	padding:5px 15px; 
+	background:#ccc; 
+	border:0 none;
+	cursor:pointer;
+	-webkit-border-radius: 5px;
+	border-radius: 5px; 
+
+}
  
 /* #submit-button-container{
 	border: 3px solid green;
