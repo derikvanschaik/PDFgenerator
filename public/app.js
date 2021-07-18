@@ -38,7 +38,9 @@ const createImageDiv = (imageName) =>{
 	const parent = document.createElement("div"); // parent div  
 	const image = document.createElement("img");
 	const caption = document.createElement("p");
-	const clickedIcon = document.createElement('img'); 
+	const clickedIcon = document.createElement('img');
+	const inputElement = document.createElement("input");
+	const submitElement = document.createElement("button"); 
 
 	image.src = `images/${imageName}`;
 	image.style.width = '100%';
@@ -52,9 +54,15 @@ const createImageDiv = (imageName) =>{
 	caption.style.visibility = 'hidden';
 	clickedIcon.style.visibility = 'hidden';
 
+	inputElement.placeholder = "Add caption";
+	inputElement.style.visibility = 'hidden';
+
+	submitElement.textContent = "Submit Caption"; 
+	submitElement.style.visibility = 'hidden'; 
+
 	imageDivStyling(parent); 
-	centerElements([image, clickedIcon, caption]);
-	appendChildren(parent, [image, clickedIcon, caption]); 
+	centerElements([image, clickedIcon, caption, inputElement, submitElement]);
+	appendChildren(parent, [image, clickedIcon, caption, inputElement, submitElement]); // order matters  
 
 	return parent;  
 }
@@ -62,7 +70,7 @@ const createImageDiv = (imageName) =>{
 const handleHoverOn = (image, isSelected) => {
 	// the box shadow css styling that creates the backshadow when hovering 
 	image.style.boxShadow = '5px 5px 10px 8px #d3d3d3';
-	const caption = image.lastChild;
+	const caption = image.firstChild.nextElementSibling.nextElementSibling;
 	// make the 'click to select' caption visible if they have not selected the div 
 	if (!isSelected){
 		caption.style.visibility = 'visible';
@@ -72,7 +80,7 @@ const handleHoverOn = (image, isSelected) => {
 const handleHoverOut = (image) =>{
 	// revert box shadow 
 	image.style.boxShadow = null;
-	const caption = image.lastChild; 
+	const caption = image.firstChild.nextElementSibling.nextElementSibling; 
 	// hide the caption 
 	caption.style.visibility = 'hidden'; 
 }
@@ -83,13 +91,23 @@ const handleClick = (image, selectedImages, index) =>{
 	if (selectedImages[index]){ // if it is already selected
 		visibility = 'hidden';
 	}
-	const clickedIcon = image.lastChild.previousElementSibling; 
+	const clickedIcon = image.firstChild.nextElementSibling; 
 	clickedIcon.style.visibility = visibility;
 	selectedImages[index] = !selectedImages[index];
-	// managing visiblity of caption 
-	if (selectedImages[index] ){
-		const caption = image.lastChild; 
-		caption.style.visibility = 'hidden'; 
+
+	// managing visiblity of caption and input element and button element
+	// button and input element are visible and hidden together
+	const caption = clickedIcon.nextElementSibling;
+	const input = caption.nextElementSibling;
+	const button = input.nextElementSibling; 
+	if (selectedImages[index] ){ 
+		caption.style.visibility = 'hidden';
+		input.style.visibility = 'visible'; // input element is visible when selected 
+		button.style.visibility = 'visible'; 
+	}else{
+		caption.style.visibility = 'visible'; 
+		input.style.visibility = 'hidden'; // input hidden when selected
+		button.style.visibility = 'hidden'; // 
 	}
 }
 
@@ -131,7 +149,7 @@ const resetSelectedImages = (selectedImages) =>{
 // hides all the selected icons from the image divs 
 const resetSelectedImageIcons = (images) =>{
 	images.forEach( (image)=>{
-		const clickedIcon = image.lastChild.previousElementSibling; 
+		const clickedIcon = image.firstChild.nextElementSibling; 
 		clickedIcon.style.visibility = 'hidden';
 	} ); 
 }
@@ -168,7 +186,16 @@ window.onload = async (event) =>{
 		}; 
 		image.onclick = () =>{
 			handleClick(image, selectedImages, index); 
+		};
+		image.lastChild.onclick = (event) =>{
+			// prevent default click event handClick()
+			console.log('Here'); 
+			event.stopPropagation(); 
 		}; 
+		image.lastChild.previousSibling.onclick = (event) =>{
+			console.log("here i guess"); 
+			event.stopPropagation(); 
+		} 
 
 	});
 
