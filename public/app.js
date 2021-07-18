@@ -77,10 +77,12 @@ const handleHoverOn = (image, isSelected) => {
 	if (!isSelected || caption.textContent !== "Click to Select"){
 		console.log(caption.textContent); 
 		caption.style.visibility = 'visible';
-	}else{
+	}
+	if (isSelected){
 		input.style.visibility = 'visible'; 
 		button.style.visibility = 'visible'; 
 	}
+
 }
 
 const handleHoverOut = (image, isSelected) =>{
