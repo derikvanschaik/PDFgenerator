@@ -178,6 +178,10 @@ const resetSelectedImageIcons = (images) =>{
 		clickedIcon.style.visibility = 'hidden';
 	} ); 
 }
+const resetCaptions = (images) =>{
+	// reset the captions to their default text 
+	images.forEach((image) => image.firstChild.nextElementSibling.nextElementSibling.textContent = "Click to Select"); 
+}
 // kind of like the 'main' function that we see in java, python, c, etc. 
 window.onload = async (event) =>{
 	
@@ -234,6 +238,7 @@ window.onload = async (event) =>{
 		};
 		// this is the input element getting clicked -- want to stop default click event 
 		image.lastChild.previousSibling.onclick = (event) =>{
+			// stop the default event 
 			event.stopPropagation(); 
 		} 
 
@@ -250,13 +255,15 @@ window.onload = async (event) =>{
 		// array will be ['01', '02']. 
 		const selectedImageNumbers = imageDigs.filter((imageNum, index) => selectedImages[index]);
 		const selectedImageUrls = selectedImageNumbers.map((imageNum) => urls[imageNum]); // array of all the base 64 encodings of the selected images 
-		const captions = images.map( (image) => image.firstChild.nextSibling.nextSibling.textContent); // get the captions 
+		const captions = images.filter( (image, index) => selectedImages[index])
+							   .map((image) => image.firstChild.nextSibling.nextSibling.textContent); // get the captions 
 
 		if (selectedImageUrls.length > 0){
 			console.log(captions); 
 			handleSubmit(selectedImageUrls, captions);
 			resetSelectedImages(selectedImages);
-			resetSelectedImageIcons(images); 
+			resetSelectedImageIcons(images);
+			resetCaptions(images); 
 			console.log(selectedImages); 
 			return;  
 		}; 
